@@ -11,7 +11,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 
@@ -21,7 +24,7 @@ import org.springframework.web.client.RestClient;
 public class WebService {
 
     private final static String TARGET_URL = "https://xyz.ag3nts.org/";
-    private final static String USERNAME = "tester ";
+    private final static String USERNAME = "tester";
     private final static String PASSWORD = "574e112a";
     private final static String PROMPT_1_PART = "Answer to the below test question: \n<question> \n";
     private final static String PROMPT_2_PART= "\n</question>\nGive a strict, short answer in form of only one word or year in YYYY format or number.";
@@ -37,6 +40,7 @@ public class WebService {
         WebDriver driver = new ChromeDriver();
         driver.get(TARGET_URL);
         String rawQuestion = driver.findElement(By.id("human-question")).getText();
+        driver.quit();
 
         String question = rawQuestion.replace("Question:\n", "");
         log.info("Pytanie ze strony: " + question);
@@ -62,19 +66,20 @@ public class WebService {
 
         log.info("Odpowiedź AI: " + chatResponse);
 
-        driver.findElement(By.name("username")).sendKeys(USERNAME);
-        driver.findElement(By.name("password")).sendKeys(PASSWORD);
-        Thread.sleep(1000000);
+        String requestBody =
+                "username=" + USERNAME +"&password=" + PASSWORD +"&answer=" + chatResponse;
 
-        driver.findElement(By.name("answer")).sendKeys(chatResponse);
-        driver.findElement(By.id("submit")).click();
-        Thread.sleep(10000);
-        log.info(driver.getPageSource());
+        String solution = restClient.post()
+                .uri(TARGET_URL)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(requestBody)
+                .retrieve()
+                .toEntity(String.class)
+                .getBody();
 
+        log.info(solution);
 
-        driver.quit();
-        return chatResponse;
-
+        return solution;
     }
 
     protected static ChromeOptions getDefaultChromeOptions() {

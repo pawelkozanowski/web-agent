@@ -5,7 +5,7 @@ import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.ChatCompletion;
 import com.openai.models.ChatCompletionCreateParams;
 import com.openai.models.ChatModel;
-import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -17,12 +17,17 @@ import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
+
 public class WebService {
 
     private final static String TARGET_URL = "https://xyz.ag3nts.org/";
-    private final static String PROMPT = "Answer to the below question. Give a strict, short one word answer: ";
+    private final static String USERNAME = "tester ";
+    private final static String PASSWORD = "574e112a";
+    private final static String PROMPT_1_PART = "Answer to the below test question: \n<question> \n";
+    private final static String PROMPT_2_PART= "\n</question>\nGive a strict, short answer in form of only one word or year in YYYY format or number.";
 
-    public String getAgentsPageContent() {
+    @SneakyThrows
+    public String getAgentsPageContent() throws Exception {
         RestClient restClient = RestClient.create();
 
         String pageContent = restClient.get().uri(TARGET_URL).retrieve().body(String.class);
@@ -36,10 +41,14 @@ public class WebService {
         String question = rawQuestion.replace("Question:\n", "");
         log.info("Pytanie ze strony: " + question);
 
+        String prompt = PROMPT_1_PART + question + PROMPT_2_PART;
+
+        log.info("PROMTP: \n" + prompt);
+
         OpenAIClient client = OpenAIOkHttpClient.fromEnv();
 
         ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
-                .addUserMessage(PROMPT + question)
+                .addUserMessage(PROMPT_1_PART + question + PROMPT_2_PART)
                 .model(ChatModel.GPT_4O_MINI)
                 .build();
 
@@ -52,6 +61,17 @@ public class WebService {
                 .flatMap(choice -> choice.message().content().stream()).findFirst().orElse("No answer from AI chat");
 
         log.info("Odpowiedź AI: " + chatResponse);
+
+        driver.findElement(By.name("username")).sendKeys(USERNAME);
+        driver.findElement(By.name("password")).sendKeys(PASSWORD);
+        Thread.sleep(1000000);
+
+        driver.findElement(By.name("answer")).sendKeys(chatResponse);
+        driver.findElement(By.id("submit")).click();
+        Thread.sleep(10000);
+        log.info(driver.getPageSource());
+
+
         driver.quit();
         return chatResponse;
 

@@ -13,6 +13,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.38'
     annotationProcessor 'org.projectlombok:lombok:1.18.38'
     implementation 'org.springframework.boot:spring-boot-starter-web:3.4.5'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.32.0'
+    implementation 'com.openai:openai-java:0.31.0'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.4'
 }
 
 test {

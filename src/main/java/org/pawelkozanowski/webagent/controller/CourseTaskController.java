@@ -2,6 +2,7 @@ package org.pawelkozanowski.webagent.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.pawelkozanowski.webagent.model.RobotMessage;
 import org.pawelkozanowski.webagent.service.ImNotHumanService;
 import org.pawelkozanowski.webagent.service.RobotLiarService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ public class CourseTaskController {
 
     @GetMapping("/s01e02")
     @SneakyThrows
-    public void makeAuthConversation() {
-        robotService.makeTheAuthenticationConversation();
+    public RobotMessage makeAuthConversation() {
+        return robotService.makeTheAuthenticationConversation();
     }
 }

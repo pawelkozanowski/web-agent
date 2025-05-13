@@ -52,7 +52,7 @@ public class RobotLiarService {
 
     private final OpenAIClient openAIClient;
 
-    public void makeTheAuthenticationConversation() {
+    public RobotMessage makeTheAuthenticationConversation() {
 
        RestClient client = RestClient.create();
 
@@ -89,6 +89,8 @@ public class RobotLiarService {
                .body(answer).retrieve().body(RobotMessage.class);
 
        log.info("Verification result: " + verificationResult.toString());
+
+       return verificationResult;
 
     }
 }

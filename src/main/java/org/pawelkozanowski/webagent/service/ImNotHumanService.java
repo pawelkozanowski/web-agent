@@ -13,15 +13,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 
 @Slf4j
 @Service
-
-public class WebService {
+public class ImNotHumanService {
 
     private final static String TARGET_URL = "https://xyz.ag3nts.org/";
     private final static String USERNAME = "tester";

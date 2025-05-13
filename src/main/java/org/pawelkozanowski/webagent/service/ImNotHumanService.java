@@ -1,10 +1,10 @@
 package org.pawelkozanowski.webagent.service;
 
 import com.openai.client.OpenAIClient;
-import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.ChatCompletion;
 import com.openai.models.ChatCompletionCreateParams;
 import com.openai.models.ChatModel;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -18,6 +18,7 @@ import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ImNotHumanService {
 
     private final static String TARGET_URL = "https://xyz.ag3nts.org/";
@@ -25,6 +26,8 @@ public class ImNotHumanService {
     private final static String PASSWORD = "574e112a";
     private final static String PROMPT_1_PART = "Answer to the below test question: \n<question> \n";
     private final static String PROMPT_2_PART= "\n</question>\nGive a strict, short answer in form of only one word or year in YYYY format or number.";
+
+    private final OpenAIClient openAIClient;
 
     @SneakyThrows
     public String getAgentsPageContent() throws Exception {
@@ -46,14 +49,12 @@ public class ImNotHumanService {
 
         log.info("PROMTP: \n" + prompt);
 
-        OpenAIClient client = OpenAIOkHttpClient.fromEnv();
-
         ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
                 .addUserMessage(PROMPT_1_PART + question + PROMPT_2_PART)
                 .model(ChatModel.GPT_4O_MINI)
                 .build();
 
-        ChatCompletion chatCompletion = client.chat()
+        ChatCompletion chatCompletion = openAIClient.chat()
                 .completions()
                 .create(params);
 
